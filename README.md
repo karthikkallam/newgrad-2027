@@ -85,3 +85,12 @@ company data lives in the `const D=[...]` array at the top of the script in
 ## License
 
 MIT
+
+## Live feed
+
+The **Live feed** tab shows real requisitions with posting dates, pulled twice
+daily from the SimplifyJobs and vanshb03 trackers and filtered to
+Software / AI-ML-Data / Quant new grad roles. Roles at your target companies
+are tagged; everything links straight to the actual application.
+
+Auto-refresh and phone alerts are set up in [SETUP.md](SETUP.md).

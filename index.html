@@ -126,6 +126,15 @@
     color:var(--muted);margin:20px 0 9px;padding-top:14px;border-top:1px solid var(--line)}
   .vsec:first-child{margin-top:0;padding-top:0;border:0}
 
+  .job{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+    padding:9px 11px;margin-bottom:5px;display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center}
+  .job .jt{font-size:13.5px;font-weight:600;line-height:1.35}
+  .job .jm{font-size:11.5px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+  .job .co{font-family:var(--mono);font-size:11px;color:var(--signal);font-weight:600}
+  .age{font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+    padding:2px 5px;border-radius:3px;font-weight:600;background:#EDF0F4;color:var(--muted)}
+  .age.hot{background:var(--urgent);color:#fff}
+  .age.warm{background:#FDEAE0;color:var(--urgent)}
   .none{padding:36px 4px;color:var(--muted);font-size:14px}
   .foot{margin-top:30px;font-size:12.5px;color:var(--muted);line-height:1.65;
     border-top:1px solid var(--line);padding-top:14px}
@@ -167,6 +176,7 @@
   <div class="tabs" role="tablist">
     <button class="tab" id="t-list" role="tab" aria-selected="true">List</button>
     <button class="tab" id="t-focus" role="tab" aria-selected="false">Focus mode</button>
+    <button class="tab" id="t-live" role="tab" aria-selected="false">Live feed</button>
     <button class="tab" id="t-vault" role="tab" aria-selected="false">Answer vault</button>
   </div>
 
@@ -207,6 +217,20 @@
   <!-- FOCUS -->
   <div id="v-focus" class="hide">
     <div class="focus" id="fbox"></div>
+  </div>
+
+  <!-- LIVE -->
+  <div id="v-live" class="hide">
+    <div class="bar">
+      <div class="r1">
+        <input type="search" id="lq" placeholder="Search live postings&hellip;" aria-label="Search live postings">
+        <select id="lcat" aria-label="Category"><option value="">All categories</option></select>
+        <button class="btn" id="l-tgt" aria-pressed="true">Target companies only</button>
+        <button class="btn" id="l-new" aria-pressed="false">Last 7 days</button>
+      </div>
+      <p class="hint" id="lmeta" style="margin:8px 2px 0"></p>
+    </div>
+    <div id="live"></div>
   </div>
 
   <!-- VAULT -->
@@ -457,20 +481,78 @@ function drawVault(){
     setTimeout(()=>{b.textContent='copy';b.classList.remove('ok');},1100);});
 }
 
+/* ---------- live feed ---------- */
+let LIVE=null,lq='',lcat='',lTgt=true,lNew=false;
+async function loadLive(){
+  if(LIVE)return LIVE;
+  try{
+    const r=await fetch('live_jobs.json?t='+Date.now());
+    if(!r.ok)throw 0;
+    LIVE=await r.json();
+  }catch(e){LIVE={error:1,jobs:[]};}
+  return LIVE;
+}
+const AGE=ts=>ts?Math.floor((Date.now()/1000-ts)/86400):null;
+function drawLive(){
+  const box=$('live'),meta=$('lmeta');
+  if(!LIVE){box.innerHTML='<p class="none">Loading live postings&hellip;</p>';return;}
+  if(LIVE.error){
+    box.innerHTML=`<p class="none">No <code>live_jobs.json</code> yet. It appears after the GitHub Action runs for the first time \u2014 Actions tab &rarr; Refresh job listings &rarr; Run workflow.</p>`;
+    meta.textContent='';return;
+  }
+  const cats=[...new Set(LIVE.jobs.map(j=>j.category))].sort();
+  if($('lcat').options.length===1)
+    $('lcat').innerHTML='<option value="">All categories</option>'+cats.map(c=>`<option>${esc(c)}</option>`).join('');
+  let v=LIVE.jobs.filter(j=>{
+    if(lTgt&&!j.target)return false;
+    if(lcat&&j.category!==lcat)return false;
+    if(lNew&&(AGE(j.posted)===null||AGE(j.posted)>7))return false;
+    if(lq){const h=(j.company+' '+j.title+' '+(j.locations||[]).join(' ')).toLowerCase();
+      if(!h.includes(lq))return false;}
+    return true;});
+  meta.innerHTML=`${LIVE.count} active roles \u00b7 ${LIVE.target_count} at your target companies \u00b7 refreshed ${esc(LIVE.generated_iso||'')} \u00b7 showing ${v.length}`;
+  if(!v.length){box.innerHTML='<p class="none">Nothing matches those filters.</p>';return;}
+  box.innerHTML=v.slice(0,400).map(j=>{
+    const a=AGE(j.posted);
+    const cls=a===null?'':a<=2?'hot':a<=7?'warm':'';
+    const lbl=a===null?'\u2014':a===0?'today':a===1?'1d ago':a+'d ago';
+    return `<div class="job">
+      <div>
+        <div class="jt">${esc(j.title||'')}</div>
+        <div class="jm"><span class="co">${esc(j.target||j.company)}</span>
+          &middot; ${esc((j.locations||[]).join(' / ')||'location n/a')} &middot; ${esc(j.category)}</div>
+      </div>
+      <div style="display:flex;gap:7px;align-items:center">
+        <span class="age ${cls}">${lbl}</span>
+        <a class="go" href="${esc(j.url)}" target="_blank" rel="noopener">Apply &#8599;</a>
+      </div>
+    </div>`;}).join('')
+    +(v.length>400?`<p class="hint">Showing the 400 most recent of ${v.length}. Narrow with search or filters.</p>`:'');
+}
+$('lq').oninput=e=>{lq=e.target.value.toLowerCase().trim();drawLive();};
+$('lcat').onchange=e=>{lcat=e.target.value;drawLive();};
+$('l-tgt').onclick=()=>{lTgt=!lTgt;$('l-tgt').setAttribute('aria-pressed',lTgt);
+  $('l-tgt').classList.toggle('pri',lTgt);drawLive();};
+$('l-tgt').classList.add('pri');
+$('l-new').onclick=()=>{lNew=!lNew;$('l-new').setAttribute('aria-pressed',lNew);
+  $('l-new').classList.toggle('pri',lNew);drawLive();};
+
 /* ---------- tabs ---------- */
 function setTab(t){
   tab=t;
-  for(const x of ['list','focus','vault']){
+  for(const x of ['list','focus','live','vault']){
     $('t-'+x).setAttribute('aria-selected',x===t);
     $('v-'+x).classList.toggle('hide',x!==t);
   }
   if(t==='list')render();
   if(t==='focus'){fi=0;drawFocus();}
+  if(t==='live'){drawLive();loadLive().then(()=>{if(tab==='live')drawLive();});}
   if(t==='vault')drawVault();
   stats();
 }
 $('t-list').onclick=()=>setTab('list');
 $('t-focus').onclick=()=>setTab('focus');
+$('t-live').onclick=()=>setTab('live');
 $('t-vault').onclick=()=>setTab('vault');
 
 /* ---------- controls ---------- */

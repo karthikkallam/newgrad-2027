@@ -1,4 +1,6 @@
 *.json
+!live_jobs.json
+!scripts/targets.json
 !package.json
 .DS_Store
 node_modules/
