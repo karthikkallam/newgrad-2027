@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>New Grad 2027 - Application Desk</title>
+<meta name="description" content="386 companies with open or imminent new grad SWE and ML roles for May 2027 graduates. Focus mode, answer vault, application tracking.">
+<meta name="color-scheme" content="light">
+<style>html,body{margin:0;padding:0;background:#E9ECF2}</style>
+</head>
+<body>
+<div id="root">
+<style>
+  #root{
+    --ground:#E9ECF2;--panel:#fff;--ink:#121A2E;--muted:#5A6785;--line:#CBD3E1;
+    --signal:#1B4DFF;--urgent:#C2410C;--done:#047857;--gold:#B45309;
+    --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+    --ui:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--ground);color:var(--ink);font-family:var(--ui);margin:0;
+    -webkit-font-smoothing:antialiased;
+  }
+  #root *,#root *::before,#root *::after{box-sizing:border-box}
+  .wrap{max-width:1180px;margin:0 auto;padding:24px 18px 90px}
+  h1,h2,h3{letter-spacing:-0.015em}
+
+  .clock{background:var(--ink);color:#fff;border-radius:6px;padding:20px 22px 16px}
+  .clock h1{font-size:18px;margin:0 0 6px;font-weight:650}
+  .clock p{margin:0 0 6px;font-size:13px;color:#9AA8C4;max-width:70ch;line-height:1.55}
+  .clock b{color:#FFC9A8}
+  .rail{position:relative;height:3px;background:#2C3552;border-radius:2px;margin-top:16px}
+  .fill{position:absolute;inset:0 auto 0 0;width:34%;background:var(--urgent);border-radius:2px}
+  .dot{position:absolute;left:34%;top:-4px;width:11px;height:11px;border-radius:50%;
+    background:var(--urgent);border:2px solid var(--ink)}
+  .ticks{display:flex;margin-top:9px}
+  .tk{flex:1;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:#7C8AAB;text-transform:uppercase}
+  .tk.on{color:#fff}
+
+  .funnel{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);
+    border-radius:6px;margin:14px 0;overflow:hidden;flex-wrap:wrap}
+  .fc{background:var(--panel);flex:1 1 105px;padding:11px 14px;position:relative}
+  .fc b{display:block;font-family:var(--mono);font-size:21px;font-weight:600;letter-spacing:-.02em}
+  .fc span{font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  .fc.u b{color:var(--urgent)}.fc.g b{color:var(--done)}.fc.b b{color:var(--signal)}
+
+  .tabs{display:flex;gap:5px;margin:16px 0 10px;border-bottom:1px solid var(--line)}
+  .tab{font-family:var(--ui);font-size:13.5px;padding:9px 14px;border:0;background:none;
+    color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+  .tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--signal);font-weight:600}
+  .tab:focus-visible{outline:2px solid var(--signal);outline-offset:-2px}
+
+  .bar{position:sticky;top:0;z-index:6;background:var(--ground);padding:9px 0 10px;
+    border-bottom:1px solid var(--line);margin-bottom:4px}
+  .r1{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+  input[type=search],.inp{flex:1 1 240px;min-width:0;font-family:var(--ui);font-size:13.5px;
+    padding:8px 11px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink)}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--signal);outline-offset:-1px;border-color:transparent}
+  .btn{font-family:var(--ui);font-size:12.5px;padding:8px 12px;border:1px solid var(--line);
+    background:var(--panel);color:var(--ink);border-radius:5px;cursor:pointer;white-space:nowrap}
+  .btn:hover{border-color:var(--muted)}
+  .btn:focus-visible{outline:2px solid var(--signal);outline-offset:1px}
+  .btn.pri{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.pri:hover{background:#22304F}
+  .chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+  .chip{font-family:var(--mono);font-size:10.5px;letter-spacing:.03em;padding:5px 8px;border-radius:4px;
+    border:1px solid var(--line);background:var(--panel);color:var(--muted);cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+  .chip:focus-visible{outline:2px solid var(--signal);outline-offset:1px}
+
+  .grp{margin-top:22px}
+  .grp h2{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 7px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+    padding:9px 11px;margin-bottom:5px}
+  .card.done{opacity:.52}
+  .top{display:grid;grid-template-columns:auto 1fr auto auto auto;gap:9px;align-items:center}
+  .star{background:none;border:0;font-size:15px;cursor:pointer;color:var(--line);padding:0 2px;line-height:1}
+  .star.on{color:var(--gold)}
+  .star:focus-visible{outline:2px solid var(--signal);outline-offset:2px}
+  .nm{font-family:var(--mono);font-size:13.5px;font-weight:600;display:flex;align-items:center;
+    gap:6px;flex-wrap:wrap}
+  .rl{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+  .flag{font-family:var(--mono);font-size:9px;letter-spacing:.07em;text-transform:uppercase;
+    padding:2px 5px;border-radius:3px;font-weight:600}
+  .flag.open{background:#D8F3E6;color:#04654B}
+  .flag.now{background:#FDEAE0;color:var(--urgent)}
+  .flag.soon{background:#E4EAFF;color:var(--signal)}
+  .flag.watch{background:#EDF0F4;color:var(--muted)}
+  .flag.nudge{background:var(--urgent);color:#fff}
+  select{font-family:var(--mono);font-size:11px;padding:6px;border:1px solid var(--line);
+    border-radius:4px;background:var(--panel);color:var(--ink);cursor:pointer}
+  a.go{font-family:var(--mono);font-size:11px;text-decoration:none;color:#fff;background:var(--signal);
+    padding:7px 10px;border-radius:4px;white-space:nowrap}
+  a.go:hover{background:#0F3ADB}
+  a.go:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .exp{background:none;border:1px solid var(--line);border-radius:4px;color:var(--muted);
+    font-size:11px;padding:6px 8px;cursor:pointer;font-family:var(--mono)}
+  .notes{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);display:none;gap:6px;flex-wrap:wrap}
+  .notes.show{display:flex}
+  .notes textarea{flex:1 1 100%;font-family:var(--ui);font-size:12.5px;padding:7px 9px;
+    border:1px solid var(--line);border-radius:4px;resize:vertical;min-height:52px;color:var(--ink)}
+  .kill{background:none;border:0;color:var(--muted);font-size:15px;cursor:pointer;padding:0 4px}
+  .kill:hover{color:var(--urgent)}
+
+  /* focus mode */
+  .focus{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:26px;text-align:center}
+  .focus .cnt{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+  .focus h3{font-family:var(--mono);font-size:26px;margin:12px 0 6px;letter-spacing:-.02em}
+  .focus .sub{font-size:13.5px;color:var(--muted);max-width:56ch;margin:0 auto 18px;line-height:1.5}
+  .focus .acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .keys{margin-top:18px;font-family:var(--mono);font-size:11px;color:var(--muted);line-height:1.9}
+  .keys kbd{background:var(--ground);border:1px solid var(--line);border-radius:3px;
+    padding:2px 5px;font-family:var(--mono);font-size:10.5px}
+
+  /* vault */
+  .vault{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:18px}
+  .vrow{display:flex;gap:7px;align-items:flex-start;margin-bottom:7px}
+  .vrow label{flex:0 0 190px;font-size:12.5px;color:var(--muted);padding-top:8px}
+  .vrow .inp,.vrow textarea{flex:1;font-family:var(--ui);font-size:13px;padding:7px 9px;
+    border:1px solid var(--line);border-radius:4px;color:var(--ink);background:var(--panel)}
+  .vrow textarea{min-height:62px;resize:vertical}
+  .cp{font-family:var(--mono);font-size:10.5px;padding:7px 9px;border:1px solid var(--line);
+    background:var(--panel);border-radius:4px;cursor:pointer;color:var(--muted)}
+  .cp:hover{border-color:var(--signal);color:var(--signal)}
+  .cp.ok{background:var(--done);color:#fff;border-color:var(--done)}
+  .vsec{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--muted);margin:20px 0 9px;padding-top:14px;border-top:1px solid var(--line)}
+  .vsec:first-child{margin-top:0;padding-top:0;border:0}
+
+  .none{padding:36px 4px;color:var(--muted);font-size:14px}
+  .foot{margin-top:30px;font-size:12.5px;color:var(--muted);line-height:1.65;
+    border-top:1px solid var(--line);padding-top:14px}
+  .foot b{color:var(--ink)}.foot a{color:var(--signal)}
+  .hide{display:none}
+  @media(max-width:640px){
+    .top{grid-template-columns:auto 1fr auto}
+    .top .go,.top select{grid-column:1/-1;width:100%;text-align:center}
+    .vrow{flex-wrap:wrap}.vrow label{flex:1 1 100%}
+  }
+  @media(prefers-reduced-motion:reduce){#root *{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="clock">
+    <h1>New grad 2027 &mdash; application desk</h1>
+    <p><b>You graduate May 2027,</b> so summer 2027 is after graduation. Most FAANG internships require returning to school &mdash; Meta asks for a Dec 2027&ndash;Jun 2029 grad date, Google requires active enrollment. Your target is <b>full-time new grad roles with 2027 starts</b>, and that cycle is open now.</p>
+    <p>Microsoft Aspire runs Aug&ndash;Oct. Meta fills 70&ndash;80% of its class by Thanksgiving. Quant opened in July.</p>
+    <div class="rail"><div class="fill"></div><div class="dot"></div></div>
+    <div class="ticks">
+      <div class="tk">Jul &middot; quant opens</div>
+      <div class="tk on">Aug &middot; you are here</div>
+      <div class="tk">Nov &middot; meta full</div>
+      <div class="tk">Mar &middot; backfill only</div>
+    </div>
+  </div>
+
+  <div class="funnel">
+    <div class="fc"><b id="k-tot">0</b><span>companies</span></div>
+    <div class="fc u"><b id="k-urg">0</b><span>open / urgent</span></div>
+    <div class="fc b"><b id="k-app">0</b><span>applied</span></div>
+    <div class="fc"><b id="k-oa">0</b><span>OA</span></div>
+    <div class="fc b"><b id="k-int">0</b><span>interview</span></div>
+    <div class="fc g"><b id="k-off">0</b><span>offers</span></div>
+    <div class="fc"><b id="k-rr">&mdash;</b><span>response rate</span></div>
+    <div class="fc u"><b id="k-nud">0</b><span>needs follow-up</span></div>
+  </div>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" id="t-list" role="tab" aria-selected="true">List</button>
+    <button class="tab" id="t-focus" role="tab" aria-selected="false">Focus mode</button>
+    <button class="tab" id="t-vault" role="tab" aria-selected="false">Answer vault</button>
+  </div>
+
+  <!-- LIST -->
+  <div id="v-list">
+    <div class="bar">
+      <div class="r1">
+        <input type="search" id="q" placeholder="Search company, role, category&hellip;" aria-label="Search">
+        <select id="sort" aria-label="Sort">
+          <option value="def">Sort: priority</option>
+          <option value="az">Sort: A&ndash;Z</option>
+          <option value="stat">Sort: status</option>
+        </select>
+        <button class="btn" id="b-star" aria-pressed="false">&#9733; Starred</button>
+        <button class="btn" id="b-hide" aria-pressed="false">Hide applied</button>
+        <button class="btn" id="b-add">+ Add</button>
+        <button class="btn" id="b-exp">Export</button>
+        <button class="btn" id="b-imp">Import</button>
+        <input type="file" id="b-file" accept="application/json" class="hide">
+      </div>
+      <div class="chips" id="c-time" role="group" aria-label="Timing"></div>
+      <div class="chips" id="c-cat" role="group" aria-label="Category"></div>
+    </div>
+    <div id="addbox" class="hide">
+      <div class="card" style="margin-top:10px">
+        <div class="r1">
+          <input class="inp" id="a-n" placeholder="Company">
+          <input class="inp" id="a-r" placeholder="Role / note">
+          <input class="inp" id="a-l" placeholder="https://&hellip;">
+          <select id="a-c"></select>
+          <button class="btn pri" id="a-save">Save</button>
+        </div>
+      </div>
+    </div>
+    <div id="list"></div>
+  </div>
+
+  <!-- FOCUS -->
+  <div id="v-focus" class="hide">
+    <div class="focus" id="fbox"></div>
+  </div>
+
+  <!-- VAULT -->
+  <div id="v-vault" class="hide">
+    <div class="vault" id="vbox"></div>
+  </div>
+
+  <div class="foot">
+    <p><b>Flags.</b> <span class="flag open">open &#10003;</span> verified against a live posting on 31 Aug 2026. <span class="flag now">apply this week</span> cycle open per company guidance. <span class="flag soon">unverified</span> I have not checked that company this cycle &mdash; historical pattern only, confirm on the posting. <span class="flag watch">rolling</span> no structured new grad program; portfolio-driven.</p>
+    <p><b>Links go to careers pages, not requisitions</b> &mdash; req URLs rot in weeks, careers pages last all season. For live req-level links: <a href="https://github.com/vanshb03/New-Grad-2027" target="_blank" rel="noopener">vanshb03</a> &middot; <a href="https://github.com/SimplifyJobs/New-Grad-Positions" target="_blank" rel="noopener">SimplifyJobs</a> &middot; <a href="https://github.com/speedyapply/2027-SWE-College-Jobs/blob/main/NEW_GRAD_USA.md" target="_blank" rel="noopener">speedyapply</a> &middot; <a href="https://github.com/zapplyjobs/New-Grad-Jobs-2027" target="_blank" rel="noopener">zapplyjobs</a> &middot; <a href="https://github.com/northwesternfintech/2027QuantInternships" target="_blank" rel="noopener">quant</a>. Subscribe to their <code>.atom</code> commit feeds.</p>
+    <p>Everything saves automatically. <b>Export &rarr; JSON backup</b> weekly.</p>
+  </div>
+</div>
+
+<script>
+const D=[["Google", "Big Tech", "Summer 2027 SWE intern OPEN since Jul 20 2026 (rolling, closes when full); 2027-start early-career FT reqs posting now", "open", "https://www.google.com/about/careers/applications/jobs/results/?q=2027"], ["Meta", "Big Tech", "New grad Engineering Bootcamp (2027 start) opens Aug–Sep; ~70–80% of class filled by Thanksgiving", "open", "https://www.metacareers.com/jobs"], ["Amazon / AWS", "Big Tech", "Opened Jul–Aug 2026, earliest of big tech; rolling close as cohort fills", "open", "https://www.amazon.jobs/content/en/career-programs/student-programs"], ["Apple", "Big Tech", "SWE intern + new grad, many orgs", "soon", "https://jobs.apple.com/en-us/search?team=Students-STDNT"], ["Microsoft", "Big Tech", "Aspire new grad 2027: main season Aug–Oct 2026 — open now; small Jan–Mar backfill round", "open", "https://jobs.careers.microsoft.com/global/en/search"], ["Netflix", "Big Tech", "New grad SWE, limited headcount", "watch", "https://explore.jobs.netflix.net/careers"], ["NVIDIA", "Big Tech", "SWE/ML intern + new grad, huge volume", "soon", "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite"], ["Tesla", "Big Tech", "SWE + Autopilot intern/new grad", "soon", "https://www.tesla.com/careers/search/"], ["Uber", "Big Tech", "Software Engineer I; univ pipeline", "soon", "https://www.uber.com/us/en/careers/list/"], ["Airbnb", "Big Tech", "New grad SWE", "soon", "https://careers.airbnb.com/"], ["LinkedIn", "Big Tech", "SWE intern + new grad", "soon", "https://careers.linkedin.com/students"], ["Salesforce", "Big Tech", "Futureforce 2027 deadline lands ~a year ahead of start", "open", "https://careers.salesforce.com/en/futureforce/"], ["Adobe", "Big Tech", "University SWE/ML", "soon", "https://careers.adobe.com/us/en/university"], ["Oracle", "Big Tech", "Campus SWE", "soon", "https://careers.oracle.com/"], ["IBM", "Big Tech", "Entry-level SWE + research", "soon", "https://www.ibm.com/careers/search"], ["Intel", "Big Tech", "SWE + silicon intern/grad", "soon", "https://jobs.intel.com/"], ["AMD", "Big Tech", "SWE/hardware new grad", "soon", "https://careers.amd.com/"], ["Qualcomm", "Big Tech", "Reqs posting now (Aug 24 batch)", "open", "https://careers.qualcomm.com/careers"], ["Cisco", "Big Tech", "Software Engineer I live", "now", "https://jobs.cisco.com/jobs/SearchJobs"], ["Dropbox", "Big Tech", "New grad SWE", "soon", "https://jobs.dropbox.com/all-jobs"], ["Pinterest", "Big Tech", "SWE intern + new grad, ML infra", "soon", "https://www.pinterestcareers.com/jobs/"], ["Snap", "Big Tech", "SWE intern + new grad", "soon", "https://careers.snap.com/jobs"], ["Reddit", "Big Tech", "New grad SWE", "soon", "https://redditinc.com/careers"], ["Spotify", "Big Tech", "Grad program + intern (US/EU)", "soon", "https://www.lifeatspotify.com/jobs"], ["Twitch", "Big Tech", "Software Engineer I", "soon", "https://www.twitch.tv/jobs/careers/"], ["Roblox", "Big Tech", "[2027] SWE Early Career live", "open", "https://careers.roblox.com/jobs"], ["Zoom", "Big Tech", "New grad SWE", "soon", "https://careers.zoom.us/jobs"], ["ServiceNow", "Big Tech", "Early career SWE", "soon", "https://careers.servicenow.com/careers"], ["Workday", "Big Tech", "New grad SWE", "soon", "https://workday.wd5.myworkdayjobs.com/Workday"], ["Intuit", "Big Tech", "New grad SWE + ML", "soon", "https://jobs.intuit.com/search-jobs"], ["PayPal", "Big Tech", "University SWE", "soon", "https://careers.pypl.com/"], ["eBay", "Big Tech", "Students & grads SWE", "soon", "https://jobs.ebayinc.com/us/en/students"], ["Block (Square)", "Big Tech", "New grad SWE", "soon", "https://block.xyz/careers/jobs"], ["Shopify", "Big Tech", "Dev Degree + intern", "soon", "https://www.shopify.com/careers"], ["Atlassian", "Big Tech", "Grad SWE (US/AU)", "soon", "https://www.atlassian.com/company/careers/all-jobs"], ["Datadog", "Big Tech", "New grad SWE, strong comp", "soon", "https://careers.datadoghq.com/all-jobs/"], ["Snowflake", "Big Tech", "University program; 70–80% intern conversion", "now", "https://careers.snowflake.com/us/en/university"], ["Databricks", "Big Tech", "Posts Jul–Aug alongside Amazon; open now", "open", "https://www.databricks.com/company/careers/open-positions"], ["MongoDB", "Big Tech", "New grad SWE", "soon", "https://www.mongodb.com/careers/jobs"], ["Cloudflare", "Big Tech", "New grad SWE + intern", "soon", "https://www.cloudflare.com/careers/jobs/"], ["DigitalOcean", "Big Tech", "Early career SWE", "watch", "https://www.digitalocean.com/careers"], ["Twilio", "Big Tech", "New grad SWE", "soon", "https://www.twilio.com/en-us/company/jobs"], ["Palantir", "Big Tech", "New grad SWE via Lever; Path program", "now", "https://www.palantir.com/careers/"], ["Broadcom / VMware", "Big Tech", "Campus SWE", "soon", "https://www.broadcom.com/company/careers"], ["Dell Technologies", "Big Tech", "Campus SWE", "soon", "https://jobs.dell.com/"], ["HP", "Big Tech", "Early career SWE", "soon", "https://jobs.hp.com/"], ["Samsung Research America", "Big Tech", "SWE/ML research intern", "soon", "https://www.samsung.com/us/careers/"], ["Sony Interactive", "Big Tech", "SWE intern/new grad", "soon", "https://www.sonyinteractive.com/en/careers/"], ["TikTok / ByteDance", "Big Tech", "2027-Start graduate SWE/ML reqs posting daily (e.g. Aug 24)", "open", "https://lifeattiktok.com/search"], ["Yahoo", "Big Tech", "Early career SWE", "watch", "https://www.yahooinc.com/careers/"], ["Expedia Group", "Big Tech", "Grad SWE program", "soon", "https://careers.expediagroup.com/jobs/"], ["Booking.com", "Big Tech", "Grad SWE (Amsterdam)", "soon", "https://jobs.booking.com/careers"], ["DoorDash", "Big Tech", "New grad SWE + ML", "soon", "https://careers.doordash.com/"], ["Instacart", "Big Tech", "New grad SWE", "soon", "https://instacart.careers/current-openings/"], ["Lyft", "Big Tech", "New grad SWE", "soon", "https://www.lyft.com/careers"], ["Wayfair", "Big Tech", "Grad SWE", "soon", "https://www.aboutwayfair.com/careers/"], ["Etsy", "Big Tech", "New grad SWE", "watch", "https://careers.etsy.com/"], ["Zillow", "Big Tech", "New grad SWE", "soon", "https://www.zillow.com/careers/"], ["Redfin", "Big Tech", "Early career SWE", "watch", "https://www.redfin.com/careers"], ["Carvana", "Big Tech", "Early career SWE", "watch", "https://www.carvana.com/careers"], ["Squarespace", "Big Tech", "New grad SWE", "watch", "https://www.squarespace.com/careers/jobs"], ["Wix", "Big Tech", "Grad SWE", "watch", "https://www.wix.com/jobs/locations"], ["GoDaddy", "Big Tech", "Early career SWE", "watch", "https://careers.godaddy.com/search-jobs"], ["HubSpot", "Big Tech", "New grad SWE", "soon", "https://www.hubspot.com/careers/jobs"], ["Zendesk", "Big Tech", "Early career SWE", "watch", "https://www.zendesk.com/jobs/"], ["OpenAI", "AI Labs", "Emerging Talent (0–3 YOE) + Residency; watch fall reopen", "now", "https://openai.com/careers/search/"], ["Anthropic", "AI Labs", "Fellows + Claude Corps; no classic intern program", "now", "https://www.anthropic.com/careers"], ["Google DeepMind", "AI Labs", "Year-round research + eng internships", "soon", "https://deepmind.google/about/careers/"], ["Meta Superintelligence Labs", "AI Labs", "Research/eng via Meta board", "soon", "https://www.metacareers.com/jobs"], ["xAI", "AI Labs", "MTS New Grad; ~$165–200k + equity", "now", "https://x.ai/careers"], ["Safe Superintelligence", "AI Labs", "No public board — network referral only", "watch", "https://ssi.inc/"], ["Mistral AI", "AI Labs", "New grad + intern (Paris/London/SF)", "now", "https://jobs.lever.co/mistral"], ["Cohere", "AI Labs", "Eng + research (Toronto/SF/London)", "soon", "https://cohere.com/careers"], ["Perplexity", "AI Labs", "Eng; artifacts matter more than cold apply", "watch", "https://www.perplexity.ai/hub/careers"], ["Character.AI", "AI Labs", "Eng roles", "watch", "https://character.ai/careers"], ["Scale AI", "AI Labs", "New grad SWE cycle reopens fall", "now", "https://scale.com/careers"], ["Together AI", "AI Labs", "New grad SWE ~$150–200k + equity", "now", "https://www.together.ai/careers"], ["Fireworks AI", "AI Labs", "Inference eng", "watch", "https://fireworks.ai/careers"], ["Anyscale", "AI Labs", "Ray/infra eng", "watch", "https://www.anyscale.com/careers"], ["Modal", "AI Labs", "Infra eng", "watch", "https://modal.com/careers"], ["Baseten", "AI Labs", "Inference/infra eng", "watch", "https://www.baseten.co/careers/"], ["Replicate", "AI Labs", "Platform eng", "watch", "https://replicate.com/about"], ["Groq", "AI Labs", "Compiler/systems intern", "watch", "https://groq.com/careers/"], ["Cerebras", "AI Labs", "New grad SWE + intern", "soon", "https://cerebras.ai/careers"], ["SambaNova", "AI Labs", "Systems/ML eng", "watch", "https://sambanova.ai/careers"], ["Tenstorrent", "AI Labs", "Silicon + compiler intern", "soon", "https://tenstorrent.com/careers"], ["Etched", "AI Labs", "ASIC/systems eng", "watch", "https://www.etched.com/careers"], ["d-Matrix", "AI Labs", "Silicon/ML eng", "watch", "https://www.d-matrix.ai/careers/"], ["Liquid AI", "AI Labs", "Research + eng", "watch", "https://www.liquid.ai/careers"], ["Sierra", "AI Labs", "2027 cohort: APX + Agent Engineering", "now", "https://sierra.ai/early-career-program"], ["Cursor (Anysphere)", "AI Labs", "Eng; portfolio-driven", "watch", "https://cursor.com/careers"], ["Cognition (Devin)", "AI Labs", "Rolling eng hiring", "now", "https://cognition.com/careers"], ["Magic.dev", "AI Labs", "Research eng", "watch", "https://magic.dev/careers"], ["Poolside", "AI Labs", "Research + eng", "watch", "https://poolside.ai/careers"], ["Windsurf (Codeium)", "AI Labs", "Acquired by Cognition Jul 2025 \\u2014 apply via Cognition", "watch", "https://cognition.com/careers"], ["Replit", "AI Labs", "Eng + agents", "watch", "https://replit.com/careers"], ["Sourcegraph", "AI Labs", "Eng", "watch", "https://sourcegraph.com/careers"], ["Augment Code", "AI Labs", "Eng", "watch", "https://www.augmentcode.com/careers"], ["Harvey", "AI Labs", "New grad SWE; SF, no relocation", "now", "https://www.harvey.ai/careers"], ["Glean", "AI Labs", "New grad SWE ~$115–140k base", "now", "https://www.glean.com/careers"], ["Writer", "AI Labs", "Eng", "watch", "https://writer.com/careers/"], ["Runway", "AI Labs", "Acceleration Program (early career)", "soon", "https://runwayml.com/careers"], ["Luma AI", "AI Labs", "Research + eng", "watch", "https://lumalabs.ai/careers"], ["Stability AI", "AI Labs", "Research eng", "watch", "https://stability.ai/careers"], ["ElevenLabs", "AI Labs", "Eng (audio/ML)", "watch", "https://elevenlabs.io/careers"], ["Suno", "AI Labs", "Eng", "watch", "https://suno.com/careers"], ["Hume AI", "AI Labs", "Research + eng", "watch", "https://www.hume.ai/careers"], ["Synthesia", "AI Labs", "Eng (London)", "watch", "https://www.synthesia.io/careers"], ["HeyGen", "AI Labs", "Eng", "watch", "https://www.heygen.com/careers"], ["Descript", "AI Labs", "Eng", "watch", "https://www.descript.com/careers"], ["AssemblyAI", "AI Labs", "ML/eng", "watch", "https://www.assemblyai.com/careers"], ["Deepgram", "AI Labs", "Speech ML eng", "watch", "https://deepgram.com/careers"], ["Hugging Face", "AI Labs", "ML eng + OSS", "watch", "https://apply.workable.com/huggingface/"], ["LangChain", "AI Labs", "Eng", "watch", "https://www.langchain.com/careers"], ["LlamaIndex", "AI Labs", "Eng", "watch", "https://www.llamaindex.ai/careers"], ["Weights & Biases", "AI Labs", "ML tooling eng", "watch", "https://wandb.ai/site/careers"], ["Pinecone", "AI Labs", "Systems eng", "watch", "https://www.pinecone.io/careers/"], ["Weaviate", "AI Labs", "Eng", "watch", "https://weaviate.io/company/careers"], ["Chroma", "AI Labs", "Eng", "watch", "https://www.trychroma.com/careers"], ["Qdrant", "AI Labs", "Rust/systems eng", "watch", "https://qdrant.tech/careers/"], ["Zilliz (Milvus)", "AI Labs", "Systems eng", "watch", "https://zilliz.com/careers"], ["Contextual AI", "AI Labs", "Research + eng", "watch", "https://contextual.ai/careers/"], ["Exa", "AI Labs", "Search/infra eng", "watch", "https://exa.ai/careers"], ["You.com", "AI Labs", "Eng", "watch", "https://you.com/careers"], ["Snorkel AI", "AI Labs", "ML eng", "watch", "https://snorkel.ai/careers/"], ["Labelbox", "AI Labs", "Eng", "watch", "https://labelbox.com/careers/"], ["Surge AI", "AI Labs", "Eng; very high comp bands", "watch", "https://www.surgehq.ai/careers"], ["Mercor", "AI Labs", "Eng", "watch", "https://mercor.com/careers"], ["Turing", "AI Labs", "Eng + LLM training", "watch", "https://www.turing.com/careers"], ["Decagon", "AI Labs", "Eng", "watch", "https://decagon.ai/careers"], ["Cresta", "AI Labs", "ML eng", "watch", "https://cresta.com/careers/"], ["Abridge", "AI Labs", "ML eng (health)", "watch", "https://www.abridge.com/careers"], ["OpenEvidence", "AI Labs", "Eng", "watch", "https://www.openevidence.com/careers"], ["Ambience Healthcare", "AI Labs", "Eng", "watch", "https://www.ambiencehealthcare.com/careers"], ["Imbue", "AI Labs", "Research eng", "watch", "https://imbue.com/careers/"], ["Ai2 (Allen Institute)", "AI Labs", "Predoc + research eng", "soon", "https://allenai.org/careers"], ["Physical Intelligence", "AI Labs", "Robotics foundation models", "watch", "https://www.physicalintelligence.company/careers"], ["World Labs", "AI Labs", "Research eng", "watch", "https://www.worldlabs.ai/careers"], ["Prime Intellect", "AI Labs", "Distributed training eng", "watch", "https://www.primeintellect.ai/careers"], ["Nous Research", "AI Labs", "Research eng", "watch", "https://nousresearch.com/careers/"], ["Jane Street", "Quant", "~$25k/mo intern base; apply IMMEDIATELY", "now", "https://www.janestreet.com/join-jane-street/open-roles/"], ["Citadel", "Quant", "SWE/QR intern; rolling, fills by late Oct", "now", "https://www.citadel.com/careers/open-opportunities/"], ["Citadel Securities", "Quant", "SWE/QT intern 2027", "now", "https://www.citadelsecurities.com/careers/open-opportunities/"], ["Two Sigma", "Quant", "SWE + QR intern 2027", "now", "https://careers.twosigma.com/careers/SearchJobs"], ["Hudson River Trading", "Quant", "Algo dev / SWE intern", "now", "https://www.hudsonrivertrading.com/careers/"], ["Jump Trading", "Quant", "SWE intern 2027", "now", "https://www.jumptrading.com/careers/"], ["D. E. Shaw", "Quant", "Software Developer 2027 live", "open", "https://www.deshaw.com/careers"], ["Optiver", "Quant", "SWE/trader intern", "now", "https://optiver.com/working-at-optiver/career-opportunities/"], ["IMC Trading", "Quant", "SWE intern 2027", "now", "https://careers.imc.com/us/en/"], ["Susquehanna (SIG)", "Quant", "SWE/QR intern", "now", "https://careers.sig.com/"], ["DRW", "Quant", "SWE intern 2027", "now", "https://drw.com/careers/open-roles"], ["Five Rings", "Quant", "SWE/QR intern", "now", "https://www.fiverings.com/careers"], ["Old Mission Capital", "Quant", "SWE intern", "now", "https://www.oldmissioncapital.com/careers/"], ["Tower Research", "Quant", "SWE intern 2027", "now", "https://www.tower-research.com/open-positions/"], ["Headlands Technologies", "Quant", "SWE/QR intern", "now", "https://www.headlandstech.com/careers/"], ["XTX Markets", "Quant", "Research/SWE (London/NY)", "now", "https://www.xtxmarkets.com/careers/"], ["Radix Trading", "Quant", "SWE intern", "now", "https://www.radix-trading.com/careers"], ["PDT Partners", "Quant", "SWE/QR intern", "now", "https://pdtpartners.com/careers"], ["Point72 / Cubist", "Quant", "Academy + SWE intern", "now", "https://careers.point72.com/"], ["Millennium", "Quant", "Tech analyst program", "now", "https://www.mlp.com/careers/"], ["Balyasny", "Quant", "Tech intern", "now", "https://bam.com/careers/"], ["ExodusPoint", "Quant", "Tech/QR intern", "now", "https://www.exoduspoint.com/careers"], ["Squarepoint Capital", "Quant", "SWE/QR intern", "now", "https://www.squarepoint-capital.com/careers"], ["Qube Research & Tech", "Quant", "SWE/QR intern", "now", "https://www.qube-rt.com/careers"], ["G-Research", "Quant", "SWE/QR intern (London)", "now", "https://www.gresearch.com/careers/"], ["Man Group", "Quant", "Tech grad (London)", "soon", "https://www.man.com/careers"], ["AQR Capital", "Quant", "SWE/QR intern", "now", "https://careers.aqr.com/"], ["Bridgewater", "Quant", "Investment Engineer intern", "now", "https://www.bridgewater.com/working-at-bridgewater"], ["Voleon", "Quant", "SWE/ML", "watch", "https://voleon.com/careers/"], ["Vatic Labs", "Quant", "SWE/QR intern", "now", "https://www.vaticlabs.com/careers"], ["Quantlab", "Quant", "SWE/QR intern", "now", "https://www.quantlab.com/careers"], ["Belvedere Trading", "Quant", "SWE intern", "now", "https://www.belvederetrading.com/careers/"], ["PEAK6", "Quant", "SWE intern", "now", "https://peak6.com/careers/"], ["Wolverine Trading", "Quant", "SWE intern", "now", "https://www.wolve.com/careers"], ["Akuna Capital", "Quant", "QD/QR/SWE/HW 2027 all live", "open", "https://akunacapital.com/careers"], ["Chicago Trading Company", "Quant", "2027 Associate Engineer full-time live", "open", "https://www.chicagotrading.com/careers/"], ["Aquatic Capital", "Quant", "SWE + QR 2027 live", "open", "https://aquatic.com/careers"], ["Flow Traders", "Quant", "SWE intern (NY/Amsterdam)", "now", "https://www.flowtraders.com/careers"], ["Da Vinci Derivatives", "Quant", "SWE/QR (Amsterdam)", "now", "https://davinciderivatives.com/careers/"], ["Virtu Financial", "Quant", "SWE intern", "now", "https://www.virtu.com/careers/"], ["Maven Securities", "Quant", "SWE/QR (London)", "now", "https://www.mavensecurities.com/careers/"], ["WorldQuant", "Quant", "QR/SWE intern", "now", "https://www.worldquant.com/careers/"], ["Arrowstreet Capital", "Quant", "SWE/QR intern", "now", "https://www.arrowstreetcapital.com/careers/"], ["Marshall Wace", "Quant", "Tech intern (London)", "now", "https://www.mwam.com/careers/"], ["Schonfeld", "Quant", "SWE/QR intern", "now", "https://www.schonfeld.com/careers/"], ["Goldman Sachs", "Quant", "Engineering summer analyst; deadlines early", "now", "https://www.goldmansachs.com/careers/students/programs"], ["Morgan Stanley", "Quant", "Tech summer analyst", "now", "https://www.morganstanley.com/careers/students-graduates"], ["JPMorgan Chase", "Quant", "SWE program + Code for Good", "now", "https://careers.jpmorgan.com/us/en/students"], ["Bank of America", "Quant", "Global Tech summer analyst", "now", "https://campus.bankofamerica.com/"], ["Citi", "Quant", "Tech summer analyst", "now", "https://jobs.citi.com/students-and-graduates"], ["BlackRock", "Quant", "Summer analyst / Aladdin eng", "now", "https://careers.blackrock.com/students/"], ["Capital One", "Quant", "TDP + SWE intern", "soon", "https://www.capitalonecareers.com/students-and-grads"], ["Bloomberg", "Quant", "SWE intern + new grad", "soon", "https://www.bloomberg.com/company/careers/students/"], ["Visa", "Quant", "University SWE", "soon", "https://usa.visa.com/careers.html"], ["Mastercard", "Quant", "Launch program", "soon", "https://careers.mastercard.com/us/en/students-and-graduates"], ["CME Group", "Quant", "SWE intern", "soon", "https://www.cmegroup.com/careers.html"], ["Nasdaq", "Quant", "SWE intern", "soon", "https://www.nasdaq.com/careers"], ["Interactive Brokers", "Quant", "SWE new grad", "soon", "https://www.interactivebrokers.com/en/general/about/careers.php"], ["Stripe", "Fintech", "New Grad SWE (must start before Oct 1)", "now", "https://stripe.com/jobs/search"], ["Ramp", "Fintech", "New grad SWE; very high comp", "now", "https://ramp.com/careers"], ["Mercury", "Fintech", "Eng", "watch", "https://mercury.com/jobs"], ["Brex", "Fintech", "New grad SWE", "soon", "https://www.brex.com/careers"], ["Plaid", "Fintech", "New grad SWE", "soon", "https://plaid.com/careers/"], ["Robinhood", "Fintech", "New grad SWE; posts ~mid-Sept", "soon", "https://careers.robinhood.com/"], ["Coinbase", "Fintech", "SWE Emerging Talent (remote US)", "now", "https://www.coinbase.com/careers/positions"], ["Affirm", "Fintech", "New grad SWE", "soon", "https://www.affirm.com/careers/open-roles"], ["Chime", "Fintech", "New grad SWE", "soon", "https://careers.chime.com/"], ["Gusto", "Fintech", "New grad SWE", "soon", "https://gusto.com/about/careers"], ["Deel", "Fintech", "Eng", "watch", "https://www.deel.com/careers/"], ["Rippling", "Fintech", "New grad SWE", "soon", "https://www.rippling.com/careers/open-roles"], ["Marqeta", "Fintech", "Early career SWE", "watch", "https://www.marqeta.com/company/careers"], ["Adyen", "Fintech", "Grad eng (Amsterdam)", "soon", "https://careers.adyen.com/vacancies"], ["Toast", "Fintech", "New grad SWE", "soon", "https://careers.toasttab.com/jobs"], ["Modern Treasury", "Fintech", "Eng", "watch", "https://www.moderntreasury.com/careers"], ["SoFi", "Fintech", "Early career SWE", "watch", "https://www.sofi.com/careers/"], ["Klarna", "Fintech", "Eng (Stockholm/Berlin)", "watch", "https://www.klarna.com/careers/"], ["Wise", "Fintech", "Grad eng (London/Tallinn)", "soon", "https://www.wise.jobs/"], ["Revolut", "Fintech", "Graduate Programme 2027 live", "open", "https://www.revolut.com/careers/"], ["Monzo", "Fintech", "Grad eng (London)", "soon", "https://monzo.com/careers/"], ["Checkout.com", "Fintech", "Eng (London)", "watch", "https://www.checkout.com/careers"], ["Nubank", "Fintech", "Eng (Brazil/global)", "watch", "https://international.nubank.com.br/careers/"], ["Wealthsimple", "Fintech", "New grad eng (Toronto)", "soon", "https://www.wealthsimple.com/careers"], ["Confluent", "Infra & SaaS", "New grad SWE", "soon", "https://www.confluent.io/careers/"], ["Elastic", "Infra & SaaS", "Early career SWE", "watch", "https://jobs.elastic.co/jobs"], ["HashiCorp", "Infra & SaaS", "Early career SWE", "watch", "https://www.hashicorp.com/careers/open-positions"], ["GitLab", "Infra & SaaS", "Early career SWE (remote)", "watch", "https://about.gitlab.com/jobs/all-jobs/"], ["GitHub", "Infra & SaaS", "Early career SWE", "soon", "https://www.github.careers/careers-home/jobs"], ["JFrog", "Infra & SaaS", "Eng", "watch", "https://jfrog.com/careers/"], ["Grafana Labs", "Infra & SaaS", "Eng (remote-first)", "watch", "https://grafana.com/careers/"], ["New Relic", "Infra & SaaS", "Early career SWE", "watch", "https://newrelic.com/about/careers"], ["Dynatrace", "Infra & SaaS", "Grad SWE", "soon", "https://careers.dynatrace.com/"], ["Splunk (Cisco)", "Infra & SaaS", "University SWE", "soon", "https://www.splunk.com/en_us/careers.html"], ["Nutanix", "Infra & SaaS", "Campus SWE", "soon", "https://nutanix.eightfold.ai/careers"], ["Pure Storage", "Infra & SaaS", "New grad SWE", "soon", "https://www.purestorage.com/company/careers.html"], ["NetApp", "Infra & SaaS", "University SWE", "soon", "https://careers.netapp.com/"], ["Box", "Infra & SaaS", "New grad SWE", "soon", "https://www.box.com/careers"], ["Smartsheet", "Infra & SaaS", "Early career SWE", "watch", "https://smartsheet.com/careers"], ["Airtable", "Infra & SaaS", "New grad SWE", "soon", "https://airtable.com/careers"], ["Miro", "Infra & SaaS", "Eng", "watch", "https://miro.com/careers/"], ["monday.com", "Infra & SaaS", "Grad eng (Tel Aviv)", "watch", "https://monday.com/careers/"], ["Asana", "Infra & SaaS", "New grad SWE", "soon", "https://asana.com/jobs"], ["Notion", "Infra & SaaS", "New Grad SWE live", "now", "https://www.notion.com/careers"], ["Figma", "Infra & SaaS", "New grad SWE; strong comp", "soon", "https://www.figma.com/careers/"], ["Canva", "Infra & SaaS", "Grad program (Sydney/SF)", "soon", "https://www.lifeatcanva.com/en/jobs/"], ["Retool", "Infra & SaaS", "New grad SWE", "soon", "https://retool.com/careers"], ["Vercel", "Infra & SaaS", "Eng", "watch", "https://vercel.com/careers"], ["Netlify", "Infra & SaaS", "Eng", "watch", "https://www.netlify.com/careers/"], ["Supabase", "Infra & SaaS", "Eng (remote)", "watch", "https://supabase.com/careers"], ["Linear", "Infra & SaaS", "Eng", "watch", "https://linear.app/careers"], ["Zapier", "Infra & SaaS", "Eng (remote)", "watch", "https://zapier.com/jobs"], ["Amplitude", "Infra & SaaS", "New grad SWE", "soon", "https://amplitude.com/careers"], ["Sentry", "Infra & SaaS", "Eng", "watch", "https://sentry.io/careers/"], ["PagerDuty", "Infra & SaaS", "Early career SWE", "watch", "https://careers.pagerduty.com/"], ["LaunchDarkly", "Infra & SaaS", "Eng", "watch", "https://launchdarkly.com/careers/"], ["Statsig", "Infra & SaaS", "New grad SWE", "soon", "https://statsig.com/careers"], ["CrowdStrike", "Security", "Reqs posting now (Aug 24 batch)", "open", "https://www.crowdstrike.com/careers/"], ["SentinelOne", "Security", "Early career SWE", "watch", "https://www.sentinelone.com/jobs/"], ["Wiz", "Security", "Eng (US/Israel)", "watch", "https://www.wiz.io/careers"], ["Palo Alto Networks", "Security", "New grad SWE live", "now", "https://jobs.paloaltonetworks.com/"], ["Okta", "Security", "New grad SWE", "soon", "https://www.okta.com/company/careers/"], ["1Password", "Security", "Eng (remote NA)", "watch", "https://1password.com/careers"], ["Tailscale", "Security", "Eng (remote)", "watch", "https://tailscale.com/careers"], ["Chainguard", "Security", "Eng", "watch", "https://www.chainguard.dev/careers"], ["Snyk", "Security", "Grad eng", "watch", "https://snyk.io/careers/"], ["Abnormal Security", "Security", "New grad SWE", "soon", "https://abnormal.ai/careers"], ["Material Security", "Security", "Eng", "watch", "https://material.security/careers"], ["Vanta", "Security", "New grad SWE", "soon", "https://www.vanta.com/careers"], ["Drata", "Security", "Eng", "watch", "https://drata.com/careers"], ["Semgrep", "Security", "Eng", "watch", "https://semgrep.dev/careers"], ["Socket", "Security", "Eng", "watch", "https://socket.dev/careers"], ["Darktrace", "Security", "Grad eng (Cambridge UK)", "soon", "https://careers.darktrace.com/"], ["Waymo", "Robotics", "SWE/ML intern + new grad", "soon", "https://waymo.com/careers/"], ["Zoox", "Robotics", "SWE intern + new grad", "soon", "https://zoox.com/careers"], ["Aurora", "Robotics", "SWE intern", "soon", "https://aurora.tech/careers"], ["Nuro", "Robotics", "SWE/ML", "watch", "https://www.nuro.ai/careers"], ["Wayve", "Robotics", "Research/eng (London)", "watch", "https://wayve.ai/careers/"], ["Applied Intuition", "Robotics", "New grad SWE; high comp", "soon", "https://www.appliedintuition.com/careers"], ["Rivian", "Robotics", "Early career SWE", "soon", "https://careers.rivian.com/"], ["Lucid Motors", "Robotics", "Early career SWE", "watch", "https://careers.lucidmotors.com/"], ["Woven by Toyota", "Robotics", "Software Engineer live now", "now", "https://woven.toyota/en/careers/"], ["Figure AI", "Robotics", "Humanoid SWE/ML", "watch", "https://www.figure.ai/careers"], ["1X Technologies", "Robotics", "Eng (Norway/US)", "watch", "https://www.1x.tech/careers"], ["Apptronik", "Robotics", "Eng (Austin)", "watch", "https://apptronik.com/careers"], ["Agility Robotics", "Robotics", "Eng", "watch", "https://agilityrobotics.com/careers"], ["Skild AI", "Robotics", "Research eng", "watch", "https://www.skild.ai/careers"], ["Boston Dynamics", "Robotics", "SWE intern + new grad", "soon", "https://bostondynamics.com/careers/"], ["Samsara", "Robotics", "New grad SWE", "soon", "https://www.samsara.com/company/careers/roles"], ["Verkada", "Robotics", "New grad SWE", "soon", "https://www.verkada.com/careers/"], ["Skydio", "Robotics", "Autonomy SWE", "watch", "https://www.skydio.com/careers"], ["Zipline", "Robotics", "SWE intern + new grad", "soon", "https://www.flyzipline.com/careers"], ["SpaceX", "Aero & Defense", "2027 new grad SWE; US person required", "now", "https://www.spacex.com/careers/jobs/"], ["Anduril", "Aero & Defense", "2027 Early Career SWE live (posted Aug 23); US person required", "open", "https://www.anduril.com/careers/"], ["Blue Origin", "Aero & Defense", "SWE intern + new grad", "soon", "https://www.blueorigin.com/careers"], ["Rocket Lab", "Aero & Defense", "SWE new grad", "soon", "https://www.rocketlabusa.com/careers/"], ["Relativity Space", "Aero & Defense", "SWE intern", "watch", "https://www.relativityspace.com/careers"], ["Planet Labs", "Aero & Defense", "SWE early career", "watch", "https://www.planet.com/company/careers/"], ["Astranis", "Aero & Defense", "SWE new grad", "watch", "https://www.astranis.com/careers"], ["Varda Space", "Aero & Defense", "SWE", "watch", "https://www.varda.com/careers"], ["Shield AI", "Aero & Defense", "Autonomy SWE; US person", "soon", "https://shield.ai/careers/"], ["Northrop Grumman", "Aero & Defense", "2027 Associate SWE live", "open", "https://www.northropgrumman.com/jobs"], ["L3Harris", "Aero & Defense", "SWE Associate live, multiple cities", "open", "https://careers.l3harris.com/"], ["Lockheed Martin", "Aero & Defense", "SWE early career", "soon", "https://www.lockheedmartinjobs.com/"], ["RTX / Raytheon", "Aero & Defense", "SWE early career", "soon", "https://careers.rtx.com/"], ["Boeing", "Aero & Defense", "SWE early career", "soon", "https://jobs.boeing.com/"], ["Recursion", "Bio & Health AI", "ML/SWE", "watch", "https://www.recursion.com/careers"], ["insitro", "Bio & Health AI", "ML research eng", "watch", "https://insitro.com/careers"], ["Isomorphic Labs", "Bio & Health AI", "ML Research Eng (London/Lausanne)", "watch", "https://www.isomorphiclabs.com/careers"], ["Genesis Therapeutics", "Bio & Health AI", "ML eng", "watch", "https://www.genesistherapeutics.ai/careers"], ["Iambic Therapeutics", "Bio & Health AI", "ML eng", "watch", "https://www.iambic.ai/careers"], ["Chai Discovery", "Bio & Health AI", "Research eng", "watch", "https://www.chaidiscovery.com/careers"], ["EvolutionaryScale", "Bio & Health AI", "Research eng", "watch", "https://www.evolutionaryscale.ai/careers"], ["Arc Institute", "Bio & Health AI", "ML research", "watch", "https://arcinstitute.org/careers"], ["Xaira Therapeutics", "Bio & Health AI", "ML eng", "watch", "https://xaira.com/careers"], ["Schrödinger", "Bio & Health AI", "Scientific SWE", "soon", "https://www.schrodinger.com/careers"], ["Tempus AI", "Bio & Health AI", "New grad SWE/ML", "soon", "https://www.tempus.com/careers/"], ["Commure", "Bio & Health AI", "New Grad SWE (Mountain View)", "now", "https://www.commure.com/careers"], ["Riot Games", "Gaming", "Interns open ~Sept", "soon", "https://www.riotgames.com/en/work-with-us/jobs"], ["Epic Games", "Gaming", "SWE intern + new grad", "soon", "https://www.epicgames.com/site/en-US/careers"], ["Valve", "Gaming", "Eng", "watch", "https://www.valvesoftware.com/en/jobs"], ["Blizzard Entertainment", "Gaming", "SWE intern", "soon", "https://careers.blizzard.com/global/en"], ["Electronic Arts", "Gaming", "SWE intern + new grad", "soon", "https://www.ea.com/careers"], ["Ubisoft", "Gaming", "Grad SWE", "soon", "https://www.ubisoft.com/en-us/company/careers"], ["Rockstar Games", "Gaming", "Eng", "watch", "https://www.rockstargames.com/careers"], ["Bungie", "Gaming", "SWE", "watch", "https://www.bungie.net/careers"], ["Niantic", "Gaming", "SWE intern", "watch", "https://nianticlabs.com/careers"], ["Scopely", "Gaming", "SWE", "watch", "https://scopely.com/careers/"], ["Unity", "Gaming", "Grad SWE", "soon", "https://careers.unity.com/"], ["Discord", "Gaming", "New grad SWE", "soon", "https://discord.com/careers"], ["Kraken", "Crypto", "Eng (remote)", "watch", "https://jobs.lever.co/kraken"], ["Gemini", "Crypto", "SWE intern + new grad", "soon", "https://www.gemini.com/careers"], ["Chainalysis", "Crypto", "SWE New Graduate + University Grad", "now", "https://www.chainalysis.com/careers/"], ["Anchorage Digital", "Crypto", "Eng", "watch", "https://www.anchorage.com/careers"], ["Fireblocks", "Crypto", "Eng", "watch", "https://www.fireblocks.com/careers/"], ["Alchemy", "Crypto", "Eng", "watch", "https://www.alchemy.com/careers"], ["Circle", "Crypto", "New grad SWE", "soon", "https://www.circle.com/careers"], ["Ripple", "Crypto", "SWE intern + new grad", "soon", "https://ripple.com/careers/"], ["Paxos", "Crypto", "Eng", "watch", "https://paxos.com/careers/"], ["TRM Labs", "Crypto", "Eng", "watch", "https://www.trmlabs.com/careers"], ["Uniswap Labs", "Crypto", "Eng", "watch", "https://boards.greenhouse.io/uniswaplabs"], ["Anza (Solana)", "Crypto", "Protocol eng", "watch", "https://www.anza.xyz/careers"], ["Phantom", "Crypto", "Eng", "watch", "https://phantom.com/careers"], ["OpenSea", "Crypto", "Eng", "watch", "https://opensea.io/careers"], ["Kalshi", "Crypto", "Eng; very high comp", "watch", "https://kalshi.com/careers"], ["Polymarket", "Crypto", "Eng", "watch", "https://polymarket.com/careers"], ["Duolingo", "Consumer", "New grad SWE + intern; strong pipeline", "soon", "https://careers.duolingo.com/"], ["Grammarly", "Consumer", "Early career SWE", "watch", "https://www.grammarly.com/careers/jobs"], ["Strava", "Consumer", "Eng", "watch", "https://www.strava.com/careers"], ["Nextdoor", "Consumer", "New grad SWE", "watch", "https://about.nextdoor.com/careers/"], ["Yelp", "Consumer", "New grad SWE (remote)", "soon", "https://www.yelp.careers/us/en"], ["SeatGeek", "Consumer", "Eng", "watch", "https://seatgeek.com/jobs"], ["Tripadvisor", "Consumer", "Eng", "watch", "https://careers.tripadvisor.com/"], ["Peloton", "Consumer", "Eng", "watch", "https://www.onepeloton.com/careers"], ["ASML", "International", "SWE grad (Netherlands/US)", "soon", "https://www.asml.com/en/careers"], ["Arm", "International", "Grad eng (Cambridge/Austin)", "soon", "https://careers.arm.com/"], ["Zalando", "International", "Grad eng (Berlin)", "soon", "https://jobs.zalando.com/en/"], ["Delivery Hero", "International", "Grad eng (Berlin)", "watch", "https://careers.deliveryhero.com/"], ["Bolt", "International", "Eng (Tallinn)", "watch", "https://bolt.eu/en/careers/"], ["SumUp", "International", "Eng (Berlin)", "watch", "https://www.sumup.com/careers/"], ["Personio", "International", "Grad eng (Munich)", "watch", "https://www.personio.com/about-personio/jobs/"], ["Celonis", "International", "Grad eng (Munich)", "soon", "https://www.celonis.com/careers/jobs/"], ["DeepL", "International", "Eng (Cologne/Berlin)", "watch", "https://jobs.deepl.com/"], ["Helsing", "International", "Defense AI eng (EU)", "watch", "https://helsing.ai/jobs"], ["Black Forest Labs", "International", "Research eng (Freiburg)", "watch", "https://bfl.ai/careers"], ["Improbable", "International", "Eng (London)", "watch", "https://www.improbable.io/careers"], ["Graphcore", "International", "Silicon/SW eng (Bristol)", "watch", "https://www.graphcore.ai/careers"], ["Quantexa", "International", "Grad eng (London)", "watch", "https://www.quantexa.com/careers/"], ["Faculty AI", "International", "AI eng (London)", "watch", "https://faculty.ai/careers/"], ["Clio", "International", "New grad eng (Vancouver)", "soon", "https://www.clio.com/about/careers/"], ["Grab", "International", "Grad eng (Singapore)", "soon", "https://www.grab.careers/en/"], ["Sea Group", "International", "Grad eng (Singapore)", "soon", "https://career.sea.com/"], ["Rakuten", "International", "Grad eng (Tokyo)", "soon", "https://global.rakuten.com/corp/careers/"], ["Mercari", "International", "Grad eng (Tokyo)", "soon", "https://careers.mercari.com/"], ["Preferred Networks", "International", "ML eng (Tokyo)", "watch", "https://www.preferred.jp/en/careers/"], ["Sakana AI", "International", "Research eng (Tokyo)", "watch", "https://sakana.ai/careers/"], ["NAVER", "International", "Grad eng (Seoul)", "soon", "https://recruit.navercorp.com/"], ["Coupang", "International", "Grad SWE (Seoul/Silicon Valley)", "soon", "https://www.coupang.jobs/en/"], ["KRAFTON", "International", "Grad eng (Seoul)", "watch", "https://www.krafton.com/en/careers/"], ["Zoho", "International", "Eng (Chennai)", "watch", "https://www.zoho.com/careers/"], ["Freshworks", "International", "Grad eng (Chennai/SF)", "soon", "https://www.freshworks.com/company/careers/"], ["Razorpay", "International", "Grad eng (Bangalore)", "soon", "https://razorpay.com/jobs/"], ["Postman", "International", "Grad eng (Bangalore/SF)", "watch", "https://www.postman.com/company/careers/"], ["BrowserStack", "International", "Grad eng (Mumbai)", "watch", "https://www.browserstack.com/careers"], ["Swiggy", "International", "Grad eng (Bangalore)", "soon", "https://careers.swiggy.com/"], ["Zomato", "International", "Grad eng (Gurugram)", "watch", "https://www.zomato.com/careers"], ["Flipkart", "International", "Grad SWE (Bangalore)", "soon", "https://www.flipkartcareers.com/"], ["Meesho", "International", "Grad eng (Bangalore)", "soon", "https://www.meesho.io/jobs"]];
+
+
+/* Storage adapter.
+   In Claude's artifact viewer, window.storage exists.
+   On GitHub Pages / any static host, it does not - fall back to localStorage.
+   Data is stored in YOUR browser only. Nothing is ever uploaded anywhere. */
+const store={
+  async get(k){
+    if(typeof window!=='undefined'&&window.storage&&window.storage.get){
+      try{return await window.storage.get(k);}catch(e){}
+    }
+    try{const v=localStorage.getItem(k);return v?{key:k,value:v}:null;}catch(e){return null;}
+  },
+  async set(k,v){
+    if(typeof window!=='undefined'&&window.storage&&window.storage.set){
+      try{return await window.storage.set(k,v);}catch(e){}
+    }
+    try{localStorage.setItem(k,v);return {key:k,value:v};}catch(e){return null;}
+  }
+};
+
+const KEY='ngdesk-v2';
+const S={status:{},notes:{},stars:{},dates:{},custom:[],vault:{}};
+let q='',sortBy='def',onlyStar=false,hideApplied=false,tf=new Set(),cf=new Set(),fi=0,tab='list';
+
+const STAT=['','applied','oa','interview','offer','rejected'];
+const SL={'':'Not started',applied:'Applied',oa:'OA / test',interview:'Interviewing',offer:'Offer',rejected:'Closed'};
+const TL={open:'Verified open',now:'Window open',soon:'Unverified',watch:'Rolling'};
+const TS={open:'open \u2713',now:'apply now',soon:'unverified',watch:'rolling'};
+const ORD={open:0,now:1,soon:2,watch:3};
+const $=id=>document.getElementById(id);
+const ALL=()=>D.concat(S.custom);
+const cats=[...new Set(D.map(d=>d[1]))];
+const today=()=>new Date().toISOString().slice(0,10);
+const days=d=>Math.floor((Date.now()-new Date(d))/864e5);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+async function load(){
+  try{const r=await store.get(KEY);if(r&&r.value)Object.assign(S,JSON.parse(r.value));}catch(e){}
+  boot();
+}
+let saveT;
+function save(){clearTimeout(saveT);saveT=setTimeout(async()=>{
+  try{await store.set(KEY,JSON.stringify(S));}catch(e){}
+},350);}
+
+/* nudge = applied 7+ days ago, still sitting at "applied" */
+const nudge=n=>S.status[n]==='applied'&&S.dates[n]&&days(S.dates[n])>=7;
+
+function stats(){
+  const a=ALL(),v=Object.values(S.status);
+  const app=v.filter(x=>x&&x!=='rejected').length;
+  const resp=v.filter(x=>['oa','interview','offer'].includes(x)).length;
+  const tot=v.filter(x=>x).length;
+  $('k-tot').textContent=a.length;
+  $('k-urg').textContent=a.filter(d=>(d[3]==='open'||d[3]==='now')&&!S.status[d[0]]).length;
+  $('k-app').textContent=app;
+  $('k-oa').textContent=v.filter(x=>x==='oa').length;
+  $('k-int').textContent=v.filter(x=>x==='interview').length;
+  $('k-off').textContent=v.filter(x=>x==='offer').length;
+  $('k-rr').textContent=tot?Math.round(resp/tot*100)+'%':'\u2014';
+  $('k-nud').textContent=a.filter(d=>nudge(d[0])).length;
+}
+
+function chips(){
+  $('c-time').innerHTML=['open','now','soon','watch'].map(t=>
+    `<button class="chip" data-t="${t}" aria-pressed="${tf.has(t)}">${TL[t]} &middot; ${ALL().filter(d=>d[3]===t).length}</button>`).join('');
+  $('c-cat').innerHTML=cats.map(c=>
+    `<button class="chip" data-c="${esc(c)}" aria-pressed="${cf.has(c)}">${esc(c)} &middot; ${ALL().filter(d=>d[1]===c).length}</button>`).join('');
+  $('c-time').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.t;tf.has(v)?tf.delete(v):tf.add(v);chips();render();});
+  $('c-cat').querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{
+    const v=b.dataset.c;cf.has(v)?cf.delete(v):cf.add(v);chips();render();});
+}
+
+function visible(){
+  let v=ALL().filter(d=>{
+    const st=S.status[d[0]]||'';
+    if(hideApplied&&st)return false;
+    if(onlyStar&&!S.stars[d[0]])return false;
+    if(tf.size&&!tf.has(d[3]))return false;
+    if(cf.size&&!cf.has(d[1]))return false;
+    if(q&&!(d[0]+' '+d[2]+' '+d[1]).toLowerCase().includes(q))return false;
+    return true;});
+  if(sortBy==='az')v.sort((a,b)=>a[0].localeCompare(b[0]));
+  else if(sortBy==='stat')v.sort((a,b)=>STAT.indexOf(S.status[a[0]]||'')-STAT.indexOf(S.status[b[0]]||''));
+  else v.sort((a,b)=>(S.stars[b[0]]?1:0)-(S.stars[a[0]]?1:0)||ORD[a[3]]-ORD[b[3]]||a[0].localeCompare(b[0]));
+  return v;
+}
+
+function row(d){
+  const n=d[0],st=S.status[n]||'',cu=d[5]==='c';
+  return `<div class="card ${st?'done':''}" data-row="${esc(n)}">
+    <div class="top">
+      <button class="star ${S.stars[n]?'on':''}" data-star="${esc(n)}" aria-label="Star ${esc(n)}">&#9733;</button>
+      <div>
+        <div class="nm">${esc(n)}
+          <span class="flag ${d[3]}">${TS[d[3]]}</span>
+          ${nudge(n)?'<span class="flag nudge">follow up</span>':''}
+        </div>
+        <div class="rl">${esc(d[2])}${S.dates[n]?' &middot; applied '+S.dates[n]:''}</div>
+      </div>
+      <button class="exp" data-exp="${esc(n)}">notes</button>
+      <select data-st="${esc(n)}" aria-label="Status ${esc(n)}">
+        ${STAT.map(s=>`<option value="${s}"${s===st?' selected':''}>${SL[s]}</option>`).join('')}
+      </select>
+      <a class="go" href="${d[4]}" target="_blank" rel="noopener">Open &#8599;</a>
+      ${cu?`<button class="kill" data-kill="${esc(n)}">&times;</button>`:''}
+    </div>
+    <div class="notes" data-nb="${esc(n)}">
+      <textarea data-nt="${esc(n)}" placeholder="Req number, recruiter name, OA deadline, referral contact&hellip;">${esc(S.notes[n]||'')}</textarea>
+    </div>
+  </div>`;
+}
+
+function render(){
+  stats();
+  if(tab!=='list')return;
+  const v=visible();
+  if(!v.length){$('list').innerHTML='<p class="none">Nothing matches. Clear a filter or change the search.</p>';return;}
+  let h='';
+  if(sortBy==='def'){
+    for(const c of cats.concat(['Added by me'])){
+      const rs=v.filter(d=>d[1]===c);
+      if(!rs.length)continue;
+      h+=`<div class="grp"><h2>${esc(c)} &mdash; ${rs.length}</h2>${rs.map(row).join('')}</div>`;
+    }
+  }else h=`<div class="grp">${v.map(row).join('')}</div>`;
+  $('list').innerHTML=h;
+  wire();
+}
+
+function wire(){
+  document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>{
+    const n=b.dataset.star;S.stars[n]?delete S.stars[n]:S.stars[n]=1;save();render();});
+  document.querySelectorAll('[data-st]').forEach(s=>s.onchange=()=>{
+    const n=s.dataset.st;
+    if(s.value){if(!S.status[n])S.dates[n]=today();S.status[n]=s.value;}
+    else{delete S.status[n];delete S.dates[n];}
+    save();render();});
+  document.querySelectorAll('[data-exp]').forEach(b=>b.onclick=()=>{
+    document.querySelector(`[data-nb="${CSS.escape(b.dataset.exp)}"]`).classList.toggle('show');});
+  document.querySelectorAll('[data-nt]').forEach(t=>t.oninput=()=>{
+    S.notes[t.dataset.nt]=t.value;save();});
+  document.querySelectorAll('[data-kill]').forEach(b=>b.onclick=()=>{
+    const n=b.dataset.kill;S.custom=S.custom.filter(x=>x[0]!==n);
+    delete S.status[n];delete S.notes[n];delete S.stars[n];delete S.dates[n];
+    save();chips();render();});
+}
+
+/* ---------- focus mode ---------- */
+function queue(){return visible().filter(d=>!S.status[d[0]]);}
+function drawFocus(){
+  const Q=queue();
+  if(!Q.length){$('fbox').innerHTML=`<div class="cnt">queue empty</div>
+    <h3>Nothing left</h3><p class="sub">Every company matching your current filters has a status. Clear a filter, or take the win.</p>`;return;}
+  if(fi>=Q.length)fi=0;
+  const d=Q[fi];
+  $('fbox').innerHTML=`
+    <div class="cnt">${fi+1} of ${Q.length} in queue &middot; ${esc(d[1])}</div>
+    <h3>${esc(d[0])}</h3>
+    <div><span class="flag ${d[3]}">${TS[d[3]]}</span></div>
+    <p class="sub" style="margin-top:12px">${esc(d[2])}</p>
+    <div class="acts">
+      <a class="btn pri" href="${d[4]}" target="_blank" rel="noopener" id="f-open">Open careers page &#8599;</a>
+      <button class="btn" id="f-app">Mark applied &rarr;</button>
+      <button class="btn" id="f-skip">Skip</button>
+      <button class="btn" id="f-star">${S.stars[d[0]]?'&#9733; Starred':'&#9734; Star'}</button>
+    </div>
+    <div class="keys">
+      <kbd>O</kbd> open &nbsp; <kbd>A</kbd> applied &nbsp; <kbd>S</kbd> skip &nbsp; <kbd>K</kbd> star &nbsp; <kbd>&larr;</kbd> back
+    </div>`;
+  $('f-app').onclick=()=>{S.status[d[0]]='applied';S.dates[d[0]]=today();save();drawFocus();stats();};
+  $('f-skip').onclick=()=>{fi++;drawFocus();};
+  $('f-star').onclick=()=>{S.stars[d[0]]?delete S.stars[d[0]]:S.stars[d[0]]=1;save();drawFocus();};
+}
+document.addEventListener('keydown',e=>{
+  if(tab!=='focus')return;
+  if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName))return;
+  const k=e.key.toLowerCase();
+  if(k==='o'){e.preventDefault();$('f-open')&&$('f-open').click();}
+  else if(k==='a'){e.preventDefault();$('f-app')&&$('f-app').click();}
+  else if(k==='s'){e.preventDefault();$('f-skip')&&$('f-skip').click();}
+  else if(k==='k'){e.preventDefault();$('f-star')&&$('f-star').click();}
+  else if(e.key==='ArrowLeft'){e.preventDefault();fi=Math.max(0,fi-1);drawFocus();}
+});
+
+/* ---------- answer vault ---------- */
+const VF=[
+  ['sec','Identity'],
+  ['name','Full legal name','i'],['email','Email','i'],['phone','Phone','i'],
+  ['addr','Street address','i'],['city','City / State / ZIP','i'],
+  ['li','LinkedIn URL','i'],['gh','GitHub URL','i'],['site','Portfolio URL','i'],
+  ['sec','Work authorization'],
+  ['auth','Authorized to work in US?','i'],['spon','Require sponsorship now or future?','i'],
+  ['itar','US Person per ITAR?','i'],
+  ['sec','Education'],
+  ['uni','University','i'],['deg','Degree + major','i'],
+  ['grad','Expected graduation','i'],['gpa','GPA (if 3.5+)','i'],
+  ['course','Relevant coursework','t'],
+  ['sec','Logistics'],
+  ['start','Earliest start date','i'],['loc','Location preferences','i'],
+  ['sal','Salary expectation','i'],['heard','How did you hear about us?','i'],
+  ['sec','Reusable text'],
+  ['bio','Two-sentence summary','t'],
+  ['why','"Why this company?" template','t'],
+  ['p1','Project blurb 1','t'],['p2','Project blurb 2','t'],['p3','Project blurb 3','t'],
+  ['ref','Referral DM template','t']
+];
+const VD={
+  sal:'Open / market rate for the role',heard:'Company website',grad:'May 2027',
+  why:'I\u2019ve been following [PRODUCT/TEAM] and want to work on [PROBLEM]. My experience with [YOUR THING] maps onto that directly.',
+  ref:'Hi [NAME] \u2014 I\u2019m a [SCHOOL] student graduating May 2027 and saw you\u2019re on [TEAM] at [COMPANY]. I just applied to [ROLE] (req [ID]).\n\nQuick context: [ONE SENTENCE].\n\nIf you have two minutes to refer me internally I\u2019d really appreciate it.'
+};
+function drawVault(){
+  let h='<p style="font-size:13px;color:var(--muted);margin:0 0 16px;line-height:1.55">Fill this once. Every field gets a copy button, so no form question ever gets retyped. This is the difference between 50 applications in a day and 15.</p>';
+  for(const f of VF){
+    if(f[0]==='sec'){h+=`<div class="vsec">${f[1]}</div>`;continue;}
+    const [k,label,type]=f;
+    const val=esc(S.vault[k]!==undefined?S.vault[k]:(VD[k]||''));
+    h+=`<div class="vrow"><label for="v-${k}">${label}</label>
+      ${type==='t'?`<textarea id="v-${k}" data-v="${k}">${val}</textarea>`
+                  :`<input class="inp" id="v-${k}" data-v="${k}" value="${val}">`}
+      <button class="cp" data-cp="${k}">copy</button></div>`;
+  }
+  $('vbox').innerHTML=h;
+  $('vbox').querySelectorAll('[data-v]').forEach(el=>el.oninput=()=>{S.vault[el.dataset.v]=el.value;save();});
+  $('vbox').querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{
+    const el=document.querySelector(`[data-v="${b.dataset.cp}"]`);
+    try{await navigator.clipboard.writeText(el.value);}catch(e){el.select();document.execCommand('copy');}
+    b.textContent='copied';b.classList.add('ok');
+    setTimeout(()=>{b.textContent='copy';b.classList.remove('ok');},1100);});
+}
+
+/* ---------- tabs ---------- */
+function setTab(t){
+  tab=t;
+  for(const x of ['list','focus','vault']){
+    $('t-'+x).setAttribute('aria-selected',x===t);
+    $('v-'+x).classList.toggle('hide',x!==t);
+  }
+  if(t==='list')render();
+  if(t==='focus'){fi=0;drawFocus();}
+  if(t==='vault')drawVault();
+  stats();
+}
+$('t-list').onclick=()=>setTab('list');
+$('t-focus').onclick=()=>setTab('focus');
+$('t-vault').onclick=()=>setTab('vault');
+
+/* ---------- controls ---------- */
+$('q').oninput=e=>{q=e.target.value.toLowerCase().trim();render();};
+$('sort').onchange=e=>{sortBy=e.target.value;render();};
+$('b-star').onclick=()=>{onlyStar=!onlyStar;$('b-star').setAttribute('aria-pressed',onlyStar);
+  $('b-star').classList.toggle('pri',onlyStar);render();};
+$('b-hide').onclick=()=>{hideApplied=!hideApplied;$('b-hide').setAttribute('aria-pressed',hideApplied);
+  $('b-hide').classList.toggle('pri',hideApplied);
+  $('b-hide').textContent=hideApplied?'Show all':'Hide applied';render();};
+$('b-add').onclick=()=>{$('addbox').classList.toggle('hide');
+  if(!$('addbox').classList.contains('hide'))$('a-n').focus();};
+$('a-save').onclick=()=>{
+  const n=$('a-n').value.trim(),r=$('a-r').value.trim()||'\u2014',l=$('a-l').value.trim();
+  if(!n||!l){alert('Company and link are both required.');return;}
+  if(ALL().some(d=>d[0].toLowerCase()===n.toLowerCase())){alert(n+' is already on the list.');return;}
+  S.custom.push([n,$('a-c').value,r,'open',l,'c']);
+  $('a-n').value=$('a-r').value=$('a-l').value='';
+  save();chips();render();$('a-n').focus();};
+
+$('b-exp').onclick=()=>{
+  const which=prompt('Type "csv" for a spreadsheet, or "json" for a full backup you can restore.','csv');
+  if(!which)return;
+  let blob,fn;
+  if(which.toLowerCase().startsWith('j')){
+    blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});fn='newgrad-backup.json';
+  }else{
+    const rows=[['Company','Category','Role','Timing','Link','Status','Applied','Starred','Notes']].concat(
+      ALL().map(d=>[d[0],d[1],d[2],TL[d[3]],d[4],SL[S.status[d[0]]||''],S.dates[d[0]]||'',
+        S.stars[d[0]]?'yes':'',(S.notes[d[0]]||'').replace(/\n/g,' ')]));
+    blob=new Blob([rows.map(r=>r.map(x=>`"${String(x).replace(/"/g,'""')}"`).join(',')).join('\n')],{type:'text/csv'});
+    fn='newgrad-2027.csv';
+  }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;a.click();};
+
+$('b-imp').onclick=()=>$('b-file').click();
+$('b-file').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(!j||typeof j!=='object')throw 0;
+      Object.assign(S,{status:j.status||{},notes:j.notes||{},stars:j.stars||{},
+        dates:j.dates||{},custom:j.custom||[],vault:j.vault||{}});
+      save();chips();setTab('list');
+      alert('Restored '+Object.keys(S.status).length+' tracked companies.');
+    }catch(err){alert('That file could not be read as a backup.');}
+  };
+  r.readAsText(f);e.target.value='';
+};
+
+function boot(){
+  $('a-c').innerHTML=cats.concat(['Added by me']).map(c=>`<option>${esc(c)}</option>`).join('');
+  chips();setTab('list');
+}
+load();
+</script>
+</div>
+
+</body>
+</html>
