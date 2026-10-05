@@ -4,8 +4,6 @@ A single-file tracker for the 2027 new grad SWE / ML recruiting cycle.
 **386 companies** across big tech, AI labs, quant, fintech, infra, security,
 robotics, aerospace, bio, gaming, crypto, and international.
 
-**[Live site →](https://YOURUSERNAME.github.io/newgrad-2027/)**
-
 ## Why this exists
 
 For a May 2027 graduate, the usual advice is wrong. Summer 2027 falls *after*
